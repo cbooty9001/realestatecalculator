@@ -1,0 +1,924 @@
+﻿<html lang="en">
+
+<head>
+    <!--  BootStrap CSS-->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-F3w7mX95PdgyTmZZMECAngseQB83DfGTowi0iMjiWaeVhAn4FJkqJByhZMI3AhiU" crossorigin="anonymous">
+
+    <!--  Chart.JS-->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.5.1/chart.js" integrity="sha512-b3xr4frvDIeyC3gqR1/iOi6T+m3pLlQyXNuvn5FiRrrKiMUJK3du2QqZbCywH6JxS5EOfW0DY0M6WwdXFbCBLQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+
+    <!-- Payments Functions-->
+    <script src="https://cdn.jsdelivr.net/npm/jstat@1.9.2/dist/jstat.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/formulajs/formulajs@2.5.0/dist/formula.min.js"></script>
+
+    <!--  Custom Monte Carlos Code-->
+    <script src="MonteCarlos.js" referrerpolicy="no-referrer"></script>
+
+   <style>
+       .tableTitle {
+          
+           text-align:center;
+           border-width: 0.5px;
+           border-color: rgb(200,200,200);
+           padding: 3px;
+       }
+
+       .tableValueLeft {
+           text-align: left;
+           border-width: 0.5px;
+           border-color: rgb(200,200,200);
+           padding: 3px;
+           font-size: 8px;
+       }
+
+       .tableValueRight {
+           text-align: right;
+           border-width: 0.5px;
+           border-color: rgb(200,200,200);
+           padding: 3px;
+       }
+
+   </style>
+
+</head>
+
+
+<!-- You will not be able to see this text. -->
+
+<body>
+    <div class="container-sm">
+        <p class="h1">Real Estate Investment Calculator</p>
+        <!-- <p class="h3">Using Monte Carlo Analysis</p>  -->
+
+
+
+
+
+
+
+
+
+
+        <div class="accordion" id="accordionPanelsStayOpenExample">
+
+            <div class="accordion-item">
+                <h2 class="accordion-header" id="panelsStayOpen-headingThree">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#panelsStayOpen-collapseThree" aria-expanded="false" aria-controls="panelsStayOpen-collapseThree">
+                        <p class="h3">Overview</p>
+                    </button>
+                </h2>
+                <div id="panelsStayOpen-collapseThree" class="accordion-collapse collapse show" aria-labelledby="panelsStayOpen-headingThree">
+                    <div class="accordion-body">
+                        <table><tr><td style="width:300px;">
+    <img src="realestate.png" style="width: 100%; padding: 20px; filter: drop-shadow(3px 3px 2px #999999); " />
+</td><td style="text-align: left;">
+                        This calculator is designed to <b>estimate returns</b> on <b>real estate rental investments</b>.  
+                        The twist is it's designed to <b>better handle uncertainty</b>.
+                            <br /><br /> 
+                         This calculator allows you to <b>enter a <i>range</i> for each input</b> in your investment calculation.  For example instead of entering a single number for what Interest Rates will be in 10 years, you provide <b>Best, Worst </B>and<b> Most Likely values</b>.  Thousands of simulations are run, each selecting random inputs from your specified range and calculating a different result.  Looking at thousands of results helps us <b>understand the probabilty of investment returns</b>.  This technique is called <a href="https://www.investopedia.com/terms/m/montecarlosimulation.asp" target="_new"> Monte Carlo Simulation.</a><br /><br />
+                            <p style="font-size: 8px;">Disclaimer: This calculator is for educational purposes only.  Consult a professional before making any investment decisions.</p>
+
+                            </td>
+                            </tr></table><br />
+                        <center><button type="button" class="btn btn-primary btn-lg" onclick=" showInput();" style="align-content:center">Enter Data</button></center>
+
+                                               
+
+                                      
+
+                    </div>
+                </div>
+            </div>
+
+
+            <div class="accordion-item">
+                <h2 class="accordion-header" id="panelsStayOpen-headingOne">
+                    <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#panelsStayOpen-collapseOne" aria-expanded="true" aria-controls="panelsStayOpen-collapseOne">
+                        <p class="h3">Inputs</p>
+                    </button>
+                </h2>
+                <div id="panelsStayOpen-collapseOne" class="accordion-collapse collapse" aria-labelledby="panelsStayOpen-headingOne">
+                    <div class="accordion-body">
+
+                        <table class="table table-hover" style="padding: 0px;  text-align: left;">
+                            <thead>
+                                <tr>
+                                    <td></td>
+                                    <td><p class="h5">Minimum<br />Value</p></td>
+                                    <td><p class="h5">Most Likely Value</p></td>
+                                    <td><p class="h5">Maximum <br />Value</p></td>
+                                    <td><p class="h5">Notes</p></td>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!--  !!!!!!!!!!!!! Purchase Details -->
+                                <tr class="table-secondary">
+                                    <td colspan="5">
+                                        <p class="h5">Purchase and Mortgage Details</p>
+                                    </td>
+
+                                </tr>
+
+
+                                <tr>
+                                    <td>(A) Purchase Price</td>
+                                    <td></td>
+
+                                    <td>
+                                        <div class="input-group mb-3">
+                                            <span class="input-group-text">$</span>
+                                            <input type="number" class="form-control" id="ml-PurchasePrice" value="500000" style="width: 100px;" />
+                                        </div>
+                                    </td>
+                                    <td></td>
+                                    <td><small>What the purchase price of the property is.</small></td>
+                                </tr>
+
+                                <tr>
+                                    <td>(B) Mortgage Amortization Period</td>
+                                    <td></td>
+                                    <td>
+                                        <div class="input-group mb-3">
+                                            <input type="number" class="form-control" id="ml-AmortizationPeriod" value="25" />
+                                            <span class="input-group-text">Years</span>
+
+                                        </div>
+
+
+
+                                    </td>
+                                    <td></td>
+                                    <td><small>Over how many years the mortgage will be financed.</small></td>
+                                </tr>
+
+
+                                <tr>
+                                    <td>(C) Starting Mortgage Interest Rate</td>
+                                    <td></td>
+
+                                    <td>
+                                        <div class="input-group mb-3">
+
+                                            <input type="number" class="form-control" id="ml-StartingInterestRate" value="1.5" style="width: 100px;" />
+                                            <span class="input-group-text">%</span>
+                                        </div>
+                                    </td>
+                                    <td></td>
+                                    <td><small>What the interest rate for the <i>initial</i> mortgage will be.<br /><br />Some <a href="https://www.ratehub.ca/best-mortgage-rates/5-year/variable" target="_new">helpful resources</a></small></td>
+                                </tr>
+
+
+                                <tr>
+                                    <td>(D) Mortgage Term </td>
+                                    <td></td>
+
+                                    <td>
+                                        <div class="input-group mb-3">
+
+
+                                            <select class="form-select" id="ml-MortgageTerm" aria-label="Choose Term of the Mortgage" value="0">
+
+                                                <option value="3">3 Year</option>
+                                                <option value="4">4 Year</option>
+                                                <option value="5">5 Year</option>
+                                                <option selected value="0">Variable</option>
+                                            </select>
+                                        </div>
+                                    </td>
+                                    <td></td>
+                                    <td><small>What the term of the <i>initial</i> mortgage will be.  This is typically less than the amortization period.  If the property is held beyond the term of the <i>initial</i>  mortgage, it is assumed that the property will be refinanced at a new interest rate when this term ends.</small></td>
+
+                                </tr>
+
+
+                                <tr>
+                                    <td>(E) Ending Mortgage Interest Rate</td>
+                                    <td>
+                                        <div class="input-group mb-3">
+                                            <input type="number" class="form-control" id="min-InterestRate" value="1.5" />
+                                            <span class="input-group-text">%</span>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="input-group mb-3">
+                                            <input type="number" class="form-control" id="mostLikely-InterestRate" value="2.5" />
+                                            <span class="input-group-text">%</span>
+
+                                        </div>
+                                    </td>
+
+                                    <td>
+                                        <div class="input-group mb-3">
+                                            <input type="number" class="form-control" id="max-InterestRate" value="4" />
+                                            <span class="input-group-text">%</span>
+
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <small>What the anticipated interest rate will be the end of <i>(J) Years to Hold Property</i></small>
+
+                                    </td>
+
+                                </tr>
+
+
+
+
+
+
+                                <tr>
+                                    <td>(F) Down Payment Percent</td>
+                                    <td></td>
+                                    <td>
+                                        <div class="input-group mb-3">
+                                            <input type="number" class="form-control" id="ml-DownpaymentPercent" value="20" />
+                                            <span class="input-group-text">%</span>
+                                        </div>
+                                    </td>
+                                    <td></td>
+                                    <td><small>What Percentage of the <i>(A) Purchase Price</i> is put as a downpayment.</small></td>
+                                </tr>
+
+
+                                <tr>
+                                    <td>(G) Legal Fees to Buy</td>
+                                    <td>
+                                        <div class="input-group mb-3">
+                                            <span class="input-group-text">$</span>
+                                            <input type="number" class="form-control" id="min-buyingLegalFees" value="1000" style="width: 100px;" "                                            />
+
+                                        </div>
+
+                                    </td>
+                                    <td>
+                                        <div class="input-group mb-3">
+                                            <span class="input-group-text">$</span>
+                                            <input type="number" class="form-control" id="ml-buyingLegalFees" value="1200" style="width: 100px;" />
+
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="input-group mb-3">
+                                            <span class="input-group-text">$</span>
+                                            <input type="number" class="form-control" id="max-buyingLegalFees" value="1500" style="width: 100px;" />
+                                        </div>
+
+                                    </td>
+                                    <td><small>What the legal fees will be to complete the purchase.</small></td>
+
+                                </tr>
+
+                                <tr>
+                                    <td>(H) Property Transfer Tax</td>
+                                    <td>
+                                    </td>
+                                    <td>
+                                        <div class="input-group mb-3">
+
+                                            <input type="number" class="form-control" id="ml-propertyTransferTax" value="1.5" style="width: 100px;" />
+                                            <span class="input-group-text">%</span>
+                                        </div>
+                                    </td>
+                                    <td>
+                                    </td>
+                                    <td><small>What the property transfer taxes will be to complete the purchase.</small></td>
+
+                                </tr>
+
+                                <tr>
+                                    <td>(I) Additional Expenses for Purchase</td>
+                                    <td>
+                                        <div class="input-group mb-3">
+                                            <span class="input-group-text">$</span>
+                                            <input type="number" class="form-control" id="min-buyingAdditionalExpenses" value="0" style="width: 100px;" "                                            />
+
+                                        </div>
+
+                                    </td>
+                                    <td>
+                                        <div class="input-group mb-3">
+                                            <span class="input-group-text">$</span>
+                                            <input type="number" class="form-control" id="ml-buyingAdditionalExpenses" value="500" style="width: 100px;" />
+
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="input-group mb-3">
+                                            <span class="input-group-text">$</span>
+                                            <input type="number" class="form-control" id="max-buyingAdditionalExpenses" value="1000" style="width: 100px;" />
+                                        </div>
+
+                                    </td>
+                                    <td><small>Any additional expenses associated with the purchase.  This may include inspections, travel, etc.</small></td>
+
+                                </tr>
+
+                                <!--  !!!!!!!!!!!!! Sales Details-->
+                                <tr class="table-secondary">
+                                    <td colspan="5">
+                                        <p class="h5">Sale Details</p>
+                                    </td>
+
+                                </tr>
+
+                                <tr>
+                                    <td>(J) Years to Hold Property</td>
+                                    <td>
+                                        <div class="input-group mb-3">
+
+                                            <input type="number" class="form-control" id="min-yearsToHold" value="3" style="width: 100px;" />
+                                            <span class="input-group-text">Years</span>
+                                        </div>
+
+                                    </td>
+                                    <td>
+                                        <div class="input-group mb-3">
+
+                                            <input type="number" class="form-control" id="ml-yearsToHold" value="5" style="width: 100px;" />
+                                            <span class="input-group-text">Years</span>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="input-group mb-3">
+
+                                            <input type="number" class="form-control" id="max-yearsToHold" value="15" style="width: 100px;" />
+                                            <span class="input-group-text">Years</span>
+                                        </div>
+
+                                    </td>
+                                    <td><small>How many years the property will be held for.</small></td>
+
+                                </tr>
+
+                                <tr>
+                                    <td>(K) Assumed Annual Appreciation</td>
+                                    <td>
+                                        <div class="input-group mb-3">
+
+                                            <input type="number" class="form-control" id="min-propertyAppreciation" value="-5" style="width: 100px;" />
+                                            <span class="input-group-text">%</span>
+                                        </div>
+
+                                    </td>
+                                    <td>
+                                        <div class="input-group mb-3">
+
+                                            <input type="number" class="form-control" id="ml-propertyAppreciation" value="2" style="width: 100px;" />
+                                            <span class="input-group-text">%</span>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="input-group mb-3">
+
+                                            <input type="number" class="form-control" id="max-propertyAppreciation" value="5" style="width: 100px;" />
+                                            <span class="input-group-text">%</span>
+                                        </div>
+
+                                    </td>
+                                    <td><small>What the average annual increae in the property price will be.<br /><br />Some resources for <a target="_new" href="https://www.crea.ca/housing-market-stats/quarterly-forecasts/">upside</a> and <a target="_new" href='https://betterdwelling.com/canadian-real-estate-overvalued-toronto-needs-a-28-correction-for-fair-value-imf/'>downside</a>.</small></td>
+
+                                </tr>
+
+                                <tr>
+                                    <td>(L) Legal Fees to Sell</td>
+                                    <td>
+                                        <div class="input-group mb-3">
+                                            <span class="input-group-text">$</span>
+                                            <input type="number" class="form-control" id="min-sellingLegalFees" value="1000" style="width: 100px;" />
+
+                                        </div>
+
+                                    </td>
+                                    <td>
+                                        <div class="input-group mb-3">
+                                            <span class="input-group-text">$</span>
+                                            <input type="number" class="form-control" id="ml-sellingLegalFees" value="1200" style="width: 100px;" />
+
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="input-group mb-3">
+                                            <span class="input-group-text">$</span>
+                                            <input type="number" class="form-control" id="max-sellingLegalFees" value="1500" style="width: 100px;" />
+                                        </div>
+
+                                    </td>
+                                    <td>
+                                        <small>What the legal fees will be to complete the sale.</small>
+                                    </td>
+                                </tr>
+
+                                <tr>
+                                    <td>(M) Realtor Fees to Sell</td>
+                                    <td>
+                                        <div class="input-group mb-3">
+
+                                            <input type="number" class="form-control" id="min-sellingRealtorFees" value="3" style="width: 100px;" />
+                                            <span class="input-group-text">%</span>
+                                        </div>
+
+                                    </td>
+                                    <td>
+                                        <div class="input-group mb-3">
+
+                                            <input type="number" class="form-control" id="ml-sellingRealtorFees" value="5" style="width: 100px;" />
+                                            <span class="input-group-text">%</span>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="input-group mb-3">
+
+                                            <input type="number" class="form-control" id="max-sellingRealtorFees" value="6" style="width: 100px;" "                                             />
+                                            <span class="input-group-text">%</span>
+                                        </div>
+
+                                    </td>
+                                    <td>
+                                        <small>What the realtor fees will be to complete the sale, in terms of percentage of the sale price.</small>
+                                    </td>
+                                </tr>
+
+
+                                <!--  !!!!!!!!!!!!! Rental Info -->
+                                <tr class="table-secondary">
+                                    <td colspan="5">
+                                        <p class="h5">Rental Details</p>
+                                    </td>
+
+                                </tr>
+                                <tr>
+                                    <td>(N) Monthly Rent</td>
+                                    <td>
+                                        <div class="input-group mb-3">
+                                            <span class="input-group-text">$</span>
+                                            <input type="number" class="form-control" id="min-MonthlyRent" value="2000" />
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="input-group mb-3">
+                                            <span class="input-group-text">$</span>
+                                            <input type="number" class="form-control" id="ml-MonthlyRent" value="2200" />
+                                        </div>
+
+                                    </td>
+                                    <td>
+                                        <div class="input-group mb-3">
+                                            <span class="input-group-text">$</span>
+                                            <input type="number" class="form-control" id="max-MonthlyRent" value="2500" />
+                                        </div>
+
+                                    </td>
+                                    <td>
+                                        <small>
+                                            What the monthly rent will be.
+                                            <br /><br />Some <a target="_new" href="https://www.numbeo.com/property-investment/in/Toronto">helpful resources</a>.
+                                        </small>
+                                    </td>
+                                </tr>
+
+                                <tr>
+                                    <td>(O) Percent of Time Occupied</td>
+                                    <td>
+
+                                        <div class="input-group mb-3">
+                                            <input type="number" class="form-control" id="min-OccupancyPercent" value="90" />
+                                            <span class="input-group-text">%</span>
+                                        </div>
+
+
+                                    </td>
+                                    <td>
+                                        <div class="input-group mb-3">
+                                            <input type="number" class="form-control" id="ml-OccupancyPercent" value="95" />
+                                            <span class="input-group-text">%</span>
+                                        </div>
+
+                                    </td>
+                                    <td>
+                                        <div class="input-group mb-3">
+                                            <input type="number" class="form-control" id="max-OccupancyPercent" value="100" />
+                                            <span class="input-group-text">%</span>
+                                        </div>
+
+                                    </td>
+                                    <td>
+                                        <small>What percent of the time will the unit be rented.</small>
+                                    </td>
+                                </tr>
+
+
+                                <tr>
+                                    <td>(P) Annual Rent Increase</td>
+                                    <td>
+
+                                        <div class="input-group mb-3">
+                                            <input type="number" class="form-control" id="min-AnnualRentIncrease" value="0" />
+                                            <span class="input-group-text">%</span>
+                                        </div>
+
+
+                                    </td>
+                                    <td>
+                                        <div class="input-group mb-3">
+                                            <input type="number" class="form-control" id="ml-AnnualRentIncrease" value="2" />
+                                            <span class="input-group-text">%</span>
+                                        </div>
+
+                                    </td>
+                                    <td>
+                                        <div class="input-group mb-3">
+                                            <input type="number" class="form-control" id="max-AnnualRentIncrease" value="3" />
+                                            <span class="input-group-text">%</span>
+                                        </div>
+
+                                    </td>
+                                    <td>
+                                        <small>What will the average annual increases in rent be.</small>
+                                    </td>
+                                </tr>
+
+
+
+
+
+
+                                <!--  !!!!!!!!!!!!! Expense Info -->
+                                <tr class="table-secondary">
+                                    <td colspan="5">
+                                        <p class="h5">Expenses</p>
+                                    </td>
+
+                                </tr>
+
+                                <tr>
+                                    <td>(Q) Monthy Expenses <br />(in dollars, including Condo Fees)</td>
+                                    <td>
+
+                                        <div class="input-group mb-3">
+                                            <span class="input-group-text">$</span>
+                                            <input type="number" class="form-control" id="min-monthlyExpenses" value="500" />
+
+                                        </div>
+
+
+                                    </td>
+                                    <td>
+                                        <div class="input-group mb-3">
+                                            <span class="input-group-text">$</span>
+                                            <input type="number" class="form-control" id="ml-monthlyExpenses" value="600" />
+
+                                        </div>
+
+                                    </td>
+                                    <td>
+                                        <div class="input-group mb-3">
+                                            <span class="input-group-text">$</span>
+                                            <input type="number" class="form-control" id="max-monthlyExpenses" value="800" />
+
+                                        </div>
+
+                                    </td>
+                                    <td>
+                                        <small>What the monthly costs expenses will be for maintenance (including condo fees), any required utilities for which you're responsible and any other reoccuring expenses.</small>
+                                    </td>
+                                </tr>
+
+                                <tr>
+                                    <td>(R) Annual Property Insurance</td>
+                                    <td>
+
+                                        <div class="input-group mb-3">
+                                            <span class="input-group-text">$</span>
+                                            <input type="number" class="form-control" id="min-annualInsurance" value="1000" />
+
+                                        </div>
+
+
+                                    </td>
+                                    <td>
+                                        <div class="input-group mb-3">
+                                            <span class="input-group-text">$</span>
+                                            <input type="number" class="form-control" id="ml-annualInsurance" value="1500" />
+
+                                        </div>
+
+                                    </td>
+                                    <td>
+                                        <div class="input-group mb-3">
+                                            <span class="input-group-text">$</span>
+                                            <input type="number" class="form-control" id="max-annualInsurance" value="2000" />
+
+                                        </div>
+
+                                    </td>
+                                    <td>
+                                        <small>What the annual insurance costs will be for property insurance.</small>
+                                    </td>
+                                </tr>
+
+                                <tr>
+                                    <td>(S) Management Fees (as percent of rent)</td>
+                                    <td>
+
+                                        <div class="input-group mb-3">
+
+                                            <input type="number" class="form-control" id="min-propertyManagementFees" value="5" />
+                                            <span class="input-group-text">%</span>
+                                        </div>
+
+
+                                    </td>
+                                    <td>
+                                        <div class="input-group mb-3">
+
+                                            <input type="number" class="form-control" id="ml-propertyManagementFees" value="10" />
+                                            <span class="input-group-text">%</span>
+                                        </div>
+
+                                    </td>
+                                    <td>
+                                        <div class="input-group mb-3">
+
+                                            <input type="number" class="form-control" id="max-propertyManagementFees" value="12" />
+                                            <span class="input-group-text">%</span>
+                                        </div>
+
+                                    </td>
+                                    <td>
+                                        <small>What the management fee will be as a percentage of rent.   <br /><br />If no property manager is used, then all three values can be set to zero.</small>
+                                    </td>
+                                </tr>
+
+                                <tr>
+                                    <td>(T) Annual Property Tax</td>
+                                    <td></td>
+                                    <td>
+                                        <div class="input-group mb-3">
+
+                                            <input type="number" class="form-control" id="ml-propertyTax" value="1.5" />
+                                            <span class="input-group-text">%</span>
+
+                                        </div>
+
+                                    </td>
+                                    <td></td>
+                                    <td><small>What the annual property taxes will be.<br /><br />This is applied to the <i>(A) Purchase Price</i>, adjusted by <i>(K) Assumed Annual Appreciation</i></small></td>
+                                </tr>
+
+                                <!--  !!!!!!!!!!!!! Economic Assumptions  -->
+                                <tr class="table-secondary">
+                                    <td colspan="5">
+                                        <p class="h5">Economic Assumptions</p>
+                                    </td>
+
+                                </tr>
+                                <tr>
+                                    <td>(U) Annual Inflation Rate</td>
+                                    <td>
+
+                                        <div class="input-group mb-3">
+
+                                            <input type="number" class="form-control" id="min-annualInflationRate" value="1" />
+                                            <span class="input-group-text">%</span>
+                                        </div>
+
+
+                                    </td>
+                                    <td>
+                                        <div class="input-group mb-3">
+
+                                            <input type="number" class="form-control" id="ml-annualInflationRate" value="2.5" />
+                                            <span class="input-group-text">%</span>
+                                        </div>
+
+                                    </td>
+                                    <td>
+                                        <div class="input-group mb-3">
+
+                                            <input type="number" class="form-control" id="max-annualInflationRate" value="5" />
+                                            <span class="input-group-text">%</span>
+                                        </div>
+
+                                    </td>
+                                    <td>
+                                        <small>What the annual inflation rate will be.  <br /><br />This is applied to <i>(Q) Monthy Expenses, (R) Annual Property Insurance</i> and <i>(S) Management Fees</i></small>
+
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <center><button type="button" class="btn btn-primary btn-lg" onclick="doAnalysis();" style="align-content:center">Run Analysis</button></center>
+
+
+
+
+
+
+
+                    </div>
+                </div>
+            </div>
+            <div class="accordion-item">
+                <h2 class="accordion-header" id="panelsStayOpen-headingTwo">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#panelsStayOpen-collapseTwo" aria-expanded="false" aria-controls="panelsStayOpen-collapseTwo">
+                        <p class="h3">Results</p>
+                    </button>
+                </h2>
+                <div id="panelsStayOpen-collapseTwo" class="accordion-collapse collapse" aria-labelledby="panelsStayOpen-headingTwo">
+                    <div class="accordion-body">
+                        <center><p class="h4">Summary</p></center>
+
+
+                        <table class="table table-hover" id="outputSummary" style="text-align: right;  padding: 5px;">
+                            <thead>
+                                <tr>
+                                    <td colspan="2"></td>
+                                    <td><center><p class="h5">Annualized Rate of Return</p><br /><small>Based on monthly cash inputs and outputs<br /><br /><br /><br /></small></center></td>
+                                    <td><center><p class="h5">Gross Yield</p><br /><small><u>Total Annual Rent </u><br /> Purchase Price<br /><br /><br /></small></center></td>
+                                    <td><center><p class="h5">Net Yield</p><br /><small><u>Total Annual Income After Expenses* </u><br /> Purchase price<br /> <br />* Excludes Mortage Payments</small></center></td>
+
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td colspan="2">
+                                        <p class="h5">Based only on <i>Most Likely</i> Input Values</p>
+                                    </td>
+                                    <td>
+                                        <div class="input-group mb-3">
+
+                                            <input class="form-control" id="ml-IRR" value="" />
+                                            <span class="input-group-text">%</span>
+
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="input-group mb-3">
+
+                                            <input class="form-control" id="ml-GrossYield" value="" />
+                                            <span class="input-group-text">%</span>
+
+                                        </div>
+                                    </td>
+                                    <td>
+
+                                        <div class="input-group mb-3">
+
+                                            <input class="form-control" id="ml-NetYield" value="" />
+                                            <span class="input-group-text">%</span>
+
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td rowspan="3">
+                                        <p class="h5">Based on <i>Range</i> of Input Values<br /></p><small>Using Monte Carlo Simulation</small>
+                                    </td>
+                                    <td>
+                                        <p class="h5">50% Probability Betweeen</p>
+                                    </td>
+                                    <td>
+                                        <div class="input-group mb-3">
+
+                                            <input class="form-control" id="P50-IRR-Low" value="" />
+                                            <span class="input-group-text">to</span>
+                                            <input class="form-control" id="P50-IRR-High" value="" />
+                                            <span class="input-group-text">%</span>
+
+                                        </div>
+                                    </td>
+                                </tr>
+
+                                <tr>
+                                    <td>
+                                        <p class="h5">80% Probability Betweeen</p>
+                                    </td>
+                                    <td>
+                                        <div class="input-group mb-3">
+
+                                            <input class="form-control" id="P80-IRR-Low" value="" />
+                                            <span class="input-group-text">to</span>
+                                            <input class="form-control" id="P80-IRR-High" value="" />
+                                            <span class="input-group-text">%</span>
+
+                                        </div>
+                                    </td>
+                                </tr>
+
+                                <tr>
+                                    <td>
+                                        <p class="h5">Model Median</p>
+                                    </td>
+                                    <td>
+                                        <div class="input-group mb-3">
+
+                                            <input class="form-control" id="ModelMedian" value="" />
+
+                                            <span class="input-group-text">%</span>
+
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <br />
+
+                        <center> <p class="h4">Probability of Annualized Return</p>
+                        <p><small>This shows the likelihood of Returns based on the range of inputs provided.</small></p>
+                        <br /></center>
+
+
+                        <!--    CANVAS FOR GRAPH-->
+                        <div id="graphLocation">
+                            <canvas id="myChart2" width="400" height="200"></canvas>
+                        </div>
+
+                        <br />
+                        <center> <p class="h4">Sensitivity Analysis</p>
+                        <p><small>This shows the relative impact of each input variable on the estimated returns.</small></p>
+                        <br /></center>
+
+
+
+                        <!--    CANVAS FOR GRAPH-->
+                        <div id="graphLocation">
+                            <canvas id="myChart3" width="400" height="200"></canvas>
+                        </div>
+
+                        <br /><br />
+
+                        <center>
+                            <p class="h4">Month by Month Analysis of <i>Most Likely</i> Values</p>
+                            <p><small>This shows an overview of how the model works by stepping through the finances each month. <br /> This is done using <i>Most Likely</i> input values.  Each simulation iteration repeats this process with different inputs values.</small></p>
+                        </center>
+                        <br />
+
+                        <table id="outputTable" style="vertical-align: top; padding: 5px;">
+                            <thead style="position: sticky; top: 0;">
+                                <tr>
+
+                                    <td rowspan="2" class="tableTitle"><p>Month</p></td>
+                                    <td colspan="5" class="tableTitle" style="color: rgba(255, 99, 132, 1); background-color: rgba(255, 99, 132, 0.2); border-color: rgba(255, 99, 132, 1); ">Cash Out</td>
+                                    <td colspan="3" class="tableTitle" style="color: rgba(75, 192, 192, 1); background-color: rgba(75, 192, 192, 0.2); border-color: rgba(75, 192, 192, 1); ">Cash In</td>
+                                    <td rowspan="2" class="tableTitle"><p>Net<br />Cash<br /></p></td>
+                                    <td rowspan="2" class="tableTitle"><p>Mortgage<br />Principle<br />Paid</p></td>
+                                    <td rowspan="2" class="tableTitle" style="width: 150px;">Notes</td>
+                                </tr>
+                                <tr>
+
+
+                                    <td class="tableTitle"><p>Mortgage</p></td>
+                                    <td class="tableTitle"><p>Taxes</p></td>
+                                    <td class="tableTitle"><p>Maintenance</p></td>
+                                    <td class="tableTitle"><p>Professional<br />Services</p></td>
+                                    <td class="tableTitle"><p>Total<br />Cash<br />Out</p></td>
+                                    <td class="tableTitle"><p>Rent</p></td>
+                                    <td class="tableTitle"><p>Sale</p></td>
+                                    <td class="tableTitle"><p>Total<br />Cash<br />In</p></td>
+
+
+                                </tr>
+                            </thead>
+                            <tbody style="vertical-align: top;">
+                                <!--  !!!!!!!!!!!!! Purchase Details -->
+
+                            </tbody>
+                        </table>
+                        <br />
+                        <center><button type="button" class="btn btn-primary btn-lg" onclick="tryAgain();" style="align-content:center">Try Again with Different Inputs</button></center>
+
+
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+
+
+
+
+        <!--
+        <div class="alert alert-primary" role="alert">
+            A simple primary alert—check it out!
+        </div>
+
+        <div class="form-floating mb-3">
+            <input type="email" class="form-control" id="floatingInput" placeholder="name@example.com">
+            <label for="floatingInput">Email address</label>
+        </div>
+    -->
+
+
+
+
+
+
+
+
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-/bQdsTh/da6pkI1MST/rWKFNjaCP5gBSY4sEBT38Q/9RBh9AH40zEOg7Hlq2THRZ" crossorigin="anonymous"></script>
+    </div>
+    </body>
+        </html>
